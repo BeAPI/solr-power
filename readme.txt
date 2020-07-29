@@ -1,10 +1,10 @@
 === Solr Search for WordPress ===
-Contributors: getpantheon, Outlandish Josh, 10up, collinsinternet, andrew.taylor, danielbachhuber
+Contributors: getpantheon, Outlandish Josh, 10up, collinsinternet, andrew.taylor, danielbachhuber, mattleff, mikengarrett
 Tags: search
 Requires at least: 4.6
 Requires PHP: 7.1
-Tested up to: 5.4
-Stable tag: 2.1.3
+Tested up to: 5.5
+Stable tag: 2.2.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -162,7 +162,66 @@ To support searching by author name (e.g. where "Pantheon" would return posts au
 <copyField source="post_author" dest="text"/>
 ```
 
+= Boosting relevancy score by publish date =
+
+The following guidance can be used to extend the Solr index and modify boosts beyond just this example.
+
+To support math functions on dates, you must add a custom `schema.xml` to Solr and **reindex with the new schema**.
+
+Add the following to `schema.xml`:
+
+      <!-- Add to <types> -->
+      <!-- See: https://lucene.apache.org/solr/6_2_0/solr-core/org/apache/solr/schema/TrieDateField.html -->
+      <fieldType name="tdate" class="solr.TrieDateField" omitNorms="true" precisionStep="6" positionIncrementGap="0"/>	
+      
+      <!-- Add to <fields> -->
+      <field name="post_date_iso" type="tdate" indexed="true" stored="true" required="true" />
+
+Add the following to your `functions.php` file.
+
+
+      <?php
+      /**
+       * Hooks into the document build process to add post date field in proper format.
+       */
+      function my_solr_build_document( $doc, $post_info ) {
+            $post_time = strtotime( $post_info->post_date );
+            // Matches format required for TrieDateField
+            $doc->setField( 'post_date_iso', gmdate( 'c\Z', $post_time ) );
+            return $doc;
+      }
+      add_filter( 'solr_build_document', 'my_solr_build_document', 10, 2 );
+      
+      /**
+       * Hooks into query processor, Dismax, to add publish date boost.
+       * See: https://www.metaltoad.com/blog/date-boosting-solr-drupal-search-results
+       */
+      function my_solr_dismax_query( $dismax ) {
+            $dismax->setQueryParser( 'edismax' );
+            $dismax->setBoostQuery( 'recip(abs(ms(NOW/HOUR,post_date_iso),3.16e-11,1,1))' );
+            return $dismax;
+      }
+      add_filter( 'solr_dismax_query', 'my_solr_dismax_query' );
+
+
+**Common issues**
+
+* Failing to post the schema.xml will result in an error during indexing, "Missing `post_date_iso` field."
+* If you have the field and type in the schema, but don't add the `solr_build_document` filter, you will get a similar error.
+* If the `post_date_iso` field is missing from the index, Solr will ignore this boost and return regular results.
+* Trying to use a regular date field for the boost query will result in an error in the request instead of results.
+
+
 == Changelog ==
+
+= 2.2.1 (July 13, 2020) =
+* Avoids pinging Solr unless we actually need, to avoid unnecessary requests [[#458](https://github.com/pantheon-systems/solr-power/pull/458)].
+
+= 2.2.0 (May 5, 2020) =
+* Uses `posts_pre_query` hook to support use of 'fields' in `WP_Query` [[#448](https://github.com/pantheon-systems/solr-power/pull/448)].
+
+= 2.1.4 (April 24, 2020) =
+* Ensures highlighting is also applied to the post excerpt [[#446](https://github.com/pantheon-systems/solr-power/pull/446)].
 
 = 2.1.3 (November 16, 2019) =
 * Add `solr_power_ajax_search_query_args` filter to modify AJAX search query arguments [[#432](https://github.com/pantheon-systems/solr-power/pull/432)].
