@@ -17,8 +17,8 @@ cache:
   directories:
     - node_modules
     - $HOME/.composer/cache
-    - $TRAVIS_BUILD_DIR/apache-solr-3.6.2
-    - $TRAVIS_BUILD_DIR/apache-solr-3.6.2.tgz
+    - $TRAVIS_BUILD_DIR/solr-8.4.1
+    - $TRAVIS_BUILD_DIR/solr-8.4.1.tgz
 
 matrix:
   include:
