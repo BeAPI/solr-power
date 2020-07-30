@@ -8,24 +8,9 @@ download() {
     echo "Downloaded"
 }
 
-is_solr_up(){
-    http_code=`echo $(curl -s -o /dev/null -w "%{http_code}" "http://localhost:$SOLR_PORT/solr/admin/ping")`
-    return `test $http_code = "200"`
-}
-
-wait_for_solr(){
-    while ! is_solr_up; do
-        sleep 3
-    done
-}
-
 run() {
     echo "Starting solr on port ${SOLR_PORT}..."
-
     $1/bin/solr start -p ${SOLR_PORT}
-    wait_for_solr
-    cd ../../
-    echo "Started"
 }
 
 post_some_documents() {
