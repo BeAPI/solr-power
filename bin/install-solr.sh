@@ -22,8 +22,7 @@ wait_for_solr(){
 run() {
     echo "Starting solr on port ${SOLR_PORT}..."
 
-    cd $1/example
-    ./bin/solr start
+    $1/bin/solr start -p ${SOLR_PORT}
     wait_for_solr
     cd ../../
     echo "Started"
@@ -48,8 +47,6 @@ download_and_run() {
 
     # Run solr
     run $dir_name $SOLR_PORT
-
-
 }
 
 download_and_run
