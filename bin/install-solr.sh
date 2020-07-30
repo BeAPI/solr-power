@@ -42,14 +42,8 @@ post_some_documents() {
 download_and_run() {
 
    
-    # Download from a Pantheon hosted file on CI
-    if $CONTINUOUS_INTEGRATION
-    then
-    	url="https://dev-solr-power.pantheonsite.io/wp-content/uploads/apache-solr-3.6.2.tgz"
-    else
-    	url="http://archive.apache.org/dist/lucene/solr/3.6.2/apache-solr-3.6.2.tgz"
-    fi
-    dir_name="apache-solr-3.6.2"
+    url="http://archive.apache.org/dist/lucene/solr/8.4.1/solr-8.4.1.tgz"
+    dir_name="solr-8.4.1"
     dir_conf="conf/"
 
     download $url
