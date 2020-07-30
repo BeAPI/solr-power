@@ -23,12 +23,7 @@ run() {
     echo "Starting solr on port ${SOLR_PORT}..."
 
     cd $1/example
-    if [ $DEBUG ]
-    then
-        java -Djetty.port=$SOLR_PORT -jar start.jar &
-    else
-        java -Djetty.port=$SOLR_PORT -jar start.jar > /dev/null 2>&1 &
-    fi
+    ./bin/solr start
     wait_for_solr
     cd ../../
     echo "Started"
