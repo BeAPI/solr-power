@@ -39,6 +39,7 @@ matrix:
 
 before_script:
   - export PATH="$HOME/.composer/vendor/bin:$PATH"
+  - composer global require "hirak/prestissimo"
   - composer install
   - |
     if [[ ! -z "$WP_VERSION" ]] ; then
