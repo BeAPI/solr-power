@@ -49,7 +49,7 @@ download_and_run() {
     download $url
 
     # copy schema.xml
-    cp schema.xml $dir_name/example/solr/$dir_conf
+    cp -R examples/beapi_conf_example/* $dir_name/example/files/conf/
 
     # Run solr
     run $dir_name $SOLR_PORT
@@ -57,4 +57,4 @@ download_and_run() {
 
 }
 
-download_and_run $SOLR_VERSION
+download_and_run
