@@ -127,6 +127,13 @@ class SolrPower_WP_Query {
 			}
 		}
 
+		// We want to be able to block Solr for specific Rest request ( ex  : Polylang )
+		if ( strpos( $_SERVER['REQUEST_URI'], '/' . rest_get_url_prefix()  ) !== 0 ) {
+			if ( true === apply_filters( 'solr_allow_rest_request', false, $_SERVER['REQUEST_URI'] ) ) {
+				return;
+			}
+		}
+
 		add_filter( 'pre_get_posts', array( $this, 'pre_get_posts' ) );
 
 		add_filter( 'posts_request', array( $this, 'posts_request' ), 10, 2 );
