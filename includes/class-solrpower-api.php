@@ -478,9 +478,7 @@ class SolrPower_Api {
 				}
 			}
 
-			// if we are on the main site, we want the results of all blogs (@sgillot) this is
-			// why I added !is_main_site()
-			if ( is_multisite() && false !== $blogid && ! is_main_site() ) {
+			if ( is_multisite() && false !== $blogid ) {
 				if ( is_null( $blogid ) ) {
 					$blogid = get_current_blog_id();
 				}
